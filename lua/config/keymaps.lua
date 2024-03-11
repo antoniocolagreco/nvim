@@ -16,3 +16,11 @@ keymaps.set("n","<C-l>", "<C-w>l", defaultOpts )    -- Navigate Right
 keymaps.set("n","<leader>sv", ":vsplit<CR>", defaultOpts )  -- Split Vertically
 keymaps.set("n","<leader>sh", ":split<CR>", defaultOpts )  -- Split Horizontally
 keymaps.set("n","<leader>sm", "MaximizerToggle<CR>", defaultOpts ) -- Toggle Minimize
+
+-- Indenting
+keymaps.set("v","<","<gv")
+keymaps.set("v",">",">gv")
+
+-- Comments
+keymaps.set("n","<C-_>", "gcc", { noremap = false } ) -- Comment line 
+keymaps.set("v","<C-_>", "gcc", { noremap = false } ) -- Comment line 
