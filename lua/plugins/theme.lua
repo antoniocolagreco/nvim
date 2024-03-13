@@ -1,4 +1,4 @@
-return { 
+return {
 	"EdenEast/nightfox.nvim",
 	priority = 999,
 	config = function()

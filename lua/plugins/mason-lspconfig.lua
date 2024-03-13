@@ -1,5 +1,21 @@
+local opts = {
+	ensure_installed = {
+		"efm",
+		"bashls",
+		"tsserver",
+		"tailwindcss",
+		"lua_ls",
+		"emmet_ls",
+		"jsonls",
+		"clangd",
+	},
+
+	automatic_installation = true,
+}
+
 return {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    "neovim/nvim-lspconfig",
+	"williamboman/mason-lspconfig.nvim",
+	opts = opts,
+	event = "BufReadPre",
+	dependencies = "williamboman/mason.nvim",
 }
