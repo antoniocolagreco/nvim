@@ -1,7 +1,21 @@
+-- Remove unused imports on save
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  group = vim.api.nvim_create_augroup("ts_imports", { clear = true }),
+  pattern = { "*.tsx,*.ts,*jsx,*.js" },
+  callback = function()
+    vim.lsp.buf.code_action({
+      apply = true,
+      context = {
+        only = { "source.removeUnused.ts" },
+        diagnostics = {},
+      },
+    })
+  end,
+})
+
 -- auto-format on save
-local lsp_fmt_group = vim.api.nvim_create_augroup("LspFormattingGroup", {})
 vim.api.nvim_create_autocmd("BufWritePre", {
-	group = lsp_fmt_group,
+	group = vim.api.nvim_create_augroup("LspFormattingGroup", {}),
 	callback = function()
 		local efm = vim.lsp.get_active_clients({ name = "efm" })
 
@@ -14,9 +28,8 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 })
 
 -- highlight on yank
-local highlight_yank_group = vim.api.nvim_create_augroup("HighlightYankGroup", {})
 vim.api.nvim_create_autocmd("TextYankPost", {
-	group = highlight_yank_group,
+	group = vim.api.nvim_create_augroup("HighlightYankGroup", {}),
 	callback = function()
 		vim.highlight.on_yank()
 	end,

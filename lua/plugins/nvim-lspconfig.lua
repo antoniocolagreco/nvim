@@ -1,5 +1,4 @@
-local keymapper = require("utils.keymapper")
-local setCmd = keymapper.setCmd
+local setLspSagaKeys = require("config.keymaps").setLspSagaKeys
 
 local debugging_signs = {
 	Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
@@ -15,32 +14,6 @@ local diagnostic_signs = {
     Hint = "",
     Info = "",
 }
-
-local on_attach = function(client, bufnr)
-	local opts = { noremap = true, silent = true, buffer = bufnr }
-
-	setCmd("n", "<leader>fd", "Lspsaga finder", opts) -- go to definition
-	setCmd("n", "<leader>gd", "Lspsaga peek_definition", opts) -- peak definition
-	setCmd("n", "<leader>gD", "Lspsaga goto_definition", opts) -- go to definition
-	setCmd("n", "<leader>ca", "Lspsaga code_action", opts) -- see available code actions
-	setCmd("n", "<leader>rn", "Lspsaga rename", opts) -- smart rename
-	setCmd("n", "<leader>D", "Lspsaga show_line_diagnostics", opts) -- show  diagnostics for line
-	setCmd("n", "<leader>d", "Lspsaga show_cursor_diagnostics", opts) -- show diagnostics for cursor
-	setCmd("n", "<leader>pd", "Lspsaga diagnostic_jump_prev", opts) -- jump to prev diagnostic in buffer
-	setCmd("n", "<leader>nd", "Lspsaga diagnostic_jump_next", opts) -- jump to next diagnostic in buffer
-	setCmd("n", "K", "Lspsaga hover_doc", opts) -- show documentation for what is under cursor
-
-	if client.name == "pyright" then
-		setCmd("<leader>oi", "PyrightOrganizeImports", opts) -- organise imports
-		setCmd("<leader>db", "DapToggleBreakpoint", opts) -- toggle breakpoint
-		setCmd("<leader>dr", "DapContinue", opts) -- continue/invoke debugger
-		setCmd("<leader>dt", "lua require('dap-python').test_method()", opts) -- run tests
-	end
-
-	if client.name == "tsserver" then
-		setCmd("<leader>oi", "TypeScriptOrganizeImports", opts) -- organise imports
-	end
-end
 
 local typescript_organise_imports = {
 	description = "Organise Imports",
@@ -68,7 +41,7 @@ local config = function()
 	-- lua
 	lspconfig.lua_ls.setup({
 		capabilities = capabilities,
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 		settings = { -- custom settings for lua
 			Lua = {
 				-- make the language server recognize "vim" global
@@ -89,13 +62,13 @@ local config = function()
 	-- json
 	lspconfig.jsonls.setup({
 		capabilities = capabilities,
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 		filetypes = { "json", "jsonc" },
 	})
 
 	-- typescript
 	lspconfig.tsserver.setup({
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 		capabilities = capabilities,
 		filetypes = {
 			"typescript",
@@ -109,7 +82,8 @@ local config = function()
 		settings = {
 			typescript = {
 				indentStyle = "space",
-				indentSize = 2,
+				indentSize = 4,
+
 			},
 		},
 		root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", ".git"),
@@ -118,14 +92,14 @@ local config = function()
 	-- bash
 	lspconfig.bashls.setup({
 		capabilities = capabilities,
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 		filetypes = { "sh", "aliasrc" },
 	})
 
 	-- typescriptreact, javascriptreact, css, sass, scss, less, svelte, vue
 	lspconfig.emmet_ls.setup({
 		capabilities = capabilities,
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 		filetypes = {
 			"typescriptreact",
 			"javascriptreact",
@@ -140,10 +114,19 @@ local config = function()
 		},
 	})
 
+    -- Astro
+	lspconfig.astro.setup({
+		capabilities = capabilities,
+		on_attach = setLspSagaKeys,
+		filetypes = {
+			"astro",
+		},
+	})
+
 	-- docker
 	lspconfig.dockerls.setup({
 		capabilities = capabilities,
-		on_attach = on_attach,
+		on_attach = setLspSagaKeys,
 	})
 
 	local luacheck = require("efmls-configs.linters.luacheck")
@@ -154,6 +137,9 @@ local config = function()
 	local shellcheck = require("efmls-configs.linters.shellcheck")
 	local shfmt = require("efmls-configs.formatters.shfmt")
 	local hadolint = require("efmls-configs.linters.hadolint")
+	local stylelint = require("efmls-configs.linters.stylelint")
+	local tailwindcss = require("efmls-configs.linters.tailwindcss")
+	local astro = require("efmls-configs.linters.astro")
 
 	-- configure efm server
 	lspconfig.efm.setup({
@@ -183,6 +169,7 @@ local config = function()
 		},
 		settings = {
 			languages = {
+                astro = { astro, tailwindcss },
 				lua = { luacheck, stylua },
 				typescript = { eslint, prettier_d },
 				json = { eslint, fixjson },
@@ -195,8 +182,8 @@ local config = function()
 				vue = { eslint, prettier_d },
 				markdown = { prettier_d },
 				docker = { hadolint, prettier_d },
-				html = { prettier_d },
-				css = { prettier_d },
+				html = { prettier_d, tailwindcss },
+				css = { prettier_d, stylelint },
 			},
 		},
 	})
